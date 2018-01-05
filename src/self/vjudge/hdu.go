@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
+
 	"github.com/pkg/errors"
 )
 
@@ -24,9 +26,10 @@ type HDUJudger struct {
 const HDUToken = "HDU"
 
 var HDURes = map[string]int{"Queuing": 0,
-	"Compiling": 1, "Running": 1,
-	"Compilation Error":                         2,
-	"Accepted":                                  3,
+	"Compiling":                                 1,
+	"Running":                                   1,
+	"Accepted":                                  2,
+	"Compilation Error":                         3,
 	"Runtime Error<br>(STACK_OVERFLOW)":         4,
 	"Runtime Error<br>(ACCESS_VIOLATION)":       4,
 	"Runtime Error<br>(ARRAY_BOUNDS_EXCEEDED)":  4,
@@ -47,6 +50,16 @@ var HDURes = map[string]int{"Queuing": 0,
 //	LanguageC:    3,
 //	LanguageCPP:  2,
 //	LanguageJAVA: 5}
+
+var hduLangPush map[int]int = map[int]int{
+	C:    1,
+	CPP:  2,
+	JAVA: 3}
+
+var hduLangPull map[int]int = map[int]int{
+	C:    3,
+	CPP:  2,
+	JAVA: 5}
 
 func (h *HDUJudger) Init() error {
 	jar, _ := cookiejar.New(nil)
@@ -97,5 +110,38 @@ func (h *HDUJudger) Login() error {
 		return errors.New("Login Failed")
 	}
 
+	return nil
+}
+
+func (h *HDUJudger) Submit() error {
+
+	uv := url.Values{}
+	uv.Add("check", "0")
+	uv.Add("problemid", "1000")
+	uv.Add("language", "2")
+	uv.Add("usercode", "#include<iostream>using namespace std;int main(){int a,b;while(cin>>a>>b){cout<<a+b<<endl;}return 0;}")
+
+	req, err := http.NewRequest("POST", "http://acm.hdu.edu.cn/submit.php?action=submit", strings.NewReader(uv.Encode()))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Host", "acm.hdu.edu.cn")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.91 Safari/537.36")
+
+	resp, err := h.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	fmt.Println(time.Now())
+
+	b, _ := ioutil.ReadAll(resp.Body)
+	html := string(b)
+
+	if strings.Index(html, "One or more following ERROR(s) occurred.") >= 0 {
+		return errors.New("Submit Failed")
+	}
 	return nil
 }

@@ -5,42 +5,38 @@
 
 package dispatch
 
-//
-//import (
-//	"encoding/json"
-//	"fmt"
-//
-//	"self/judger"
-//
-//	"github.com/nsqio/go-nsq"
-//	log "github.com/sirupsen/logrus"
-//)
-//
-//type Handler struct {
-//	Topic string
-//}
-//
-//func (this *Handler) HandleMessage(m *nsq.Message) error {
-//	fmt.Println(string(m.Body))
-//
-//	judgeEvent := new(judger.JudgeEvent)
-//	if err := json.Unmarshal(m.Body, judgeEvent); err != nil {
-//		log.Errorf("unmarshal judgeEvent from nsqdata failed, err: %v, event:%s", err, m.Body)
-//		return err
-//	}
-//
-//	fmt.Printf("%#v\n", judgeEvent)
-//
-//	handlerCount <- 1
-//	go this.doJudge(judgeEvent)
-//
-//	return nil
-//}
-//
-//func (this *Handler) doJudge(judgeEvent *judger.JudgeEvent) {
-//	defer func() {
-//		<-handlerCount
-//	}()
-//
-//	judgeEvent.DoJudge()
-//}
+import (
+	"encoding/json"
+
+	"self/vjudge"
+
+	"github.com/nsqio/go-nsq"
+	log "github.com/sirupsen/logrus"
+)
+
+type Handler struct {
+	Topic string
+}
+
+func (this *Handler) HandleMessage(m *nsq.Message) error {
+	vjudgeData := new(vjudge.VJudge)
+	if err := json.Unmarshal(m.Body, vjudgeData); err != nil {
+		log.Errorf("unmarshal JudgerData from NsqMessage failed, err: %v, event:%s", err, m.Body)
+		return nil
+	}
+
+	log.Infof("consume Message from dispatch: %#v", vjudgeData)
+
+	handlerCount <- 1
+	go this.doJudge(vjudgeData)
+
+	return nil
+}
+
+func (this *Handler) doJudge(vjudgeData *vjudge.VJudge) {
+	defer func() {
+		<-handlerCount
+	}()
+
+	vjudgeData.DoJudge()
+}

@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"self/proxy_pool/ua_pool"
+	"self/ua_pool"
 )
 
 func TestXicidaili(t *testing.T) {

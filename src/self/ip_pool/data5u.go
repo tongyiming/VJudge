@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"self/proxy_pool/ua_pool"
+	"self/ua_pool"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/parnurzeal/gorequest"

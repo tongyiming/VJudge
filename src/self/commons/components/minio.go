@@ -7,11 +7,14 @@ package components
 
 import (
 	"io"
+	"io/ioutil"
+	"net/http"
 	"self/commons/g"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
 	"github.com/minio/minio-go"
 )
 
@@ -74,4 +77,23 @@ func (this MinioCli) DownloadCase(objectName, filePath string) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (this MinioCli) GetCode(name string) string {
+	cfg := g.Conf()
+	var flag bool
+	resp, err := http.Get("http://xupt1.fightcoder.com:9001/" + cfg.Minio.CodeBucket + "/" + name)
+	if err != nil {
+		flag = true
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		flag = true
+	}
+	if flag {
+		return ""
+	}
+	return string(body)
 }

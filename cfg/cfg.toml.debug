@@ -20,7 +20,7 @@ webAddr = "root:123456@tcp(xupt4.fightcoder.com:9000)/fightcoder?charset=utf8&lo
 
 [nsq]
 lookupds = ["xupt2.fightcoder.com:9001"]
-judgeTopic = "realJudge"
+judgeTopic = "virtualJudge"
 judgeChannel = "x"
 handlerCount = 5
 

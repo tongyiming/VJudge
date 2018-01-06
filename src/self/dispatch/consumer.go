@@ -6,11 +6,10 @@
 package dispatch
 
 import (
-	"log"
-
 	"self/commons/g"
 
 	"github.com/nsqio/go-nsq"
+	log "github.com/sirupsen/logrus"
 )
 
 type Consumer struct {
@@ -50,7 +49,7 @@ func (this *Consumer) newConsumer(topic, channel string) {
 		log.Fatal(err)
 	}
 
-	//this.NsqConsumer.AddHandler(&Handler{Topic: topic})
+	this.NsqConsumer.AddHandler(&Handler{Topic: topic})
 
 	err = this.NsqConsumer.ConnectToNSQLookupds(g.Conf().Nsq.Lookupds)
 	if err != nil {

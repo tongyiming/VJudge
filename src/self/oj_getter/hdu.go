@@ -74,14 +74,14 @@ func (this HDUGetter) update(problem models.Problem, problemType string) {
 	switch problemType {
 	case "user":
 		problemUser := models.ProblemUser{}
-		if err := json.Unmarshal(problemJson, problemUser); err != nil {
+		if err := json.Unmarshal(problemJson, &problemUser); err != nil {
 			panic("HDUGetter update: " + err.Error())
 		}
 
 		models.ProblemUser{}.Create(&problemUser)
 	case "check":
 		problemCheck := models.ProblemCheck{}
-		if err := json.Unmarshal(problemJson, problemCheck); err != nil {
+		if err := json.Unmarshal(problemJson, &problemCheck); err != nil {
 			panic("HDUGetter save: " + err.Error())
 		}
 
